@@ -32,6 +32,7 @@
     "probot-commands": "^1.1.0",
     "probot-metadata": "^1.0.1",
     "probot-scheduler": "^2.0.0-beta.1",
+    "probot-serverless-now": "^2.1.2",
     "underscore": "^1.10.2"
   },
   "devDependencies": {
