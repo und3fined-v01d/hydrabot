@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "env": {
     "APP_ID":"@probot-api-id",
     "WEBHOOK_SECRET": "@probot-webhook-secret",
