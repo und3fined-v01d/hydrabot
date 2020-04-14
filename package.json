@@ -7,7 +7,7 @@
   "repository": "https://github.com/AlQaholic007/hydrabot.git",
   "scripts": {
     "dev": "LOG_LEVEL=trace NODE_ENV=development HYDRABOT_SCHEDULER=true nodemon --exec 'npm start'",
-    "start": "probot run ./index.js",
+    "start": "HYDRABOT_SCHEDULER=true probot run ./index.js",
     "test": "NODE_ENV=test jest && standard",
     "test:unit": "LOG_LEVEL=warn NODE_ENV=test jest __tests__/unit/* && standard",
     "test:e2e": "LOG_LEVEL=warn NODE_ENV=test jest __tests__/e2e/* && standard",
