@@ -3,13 +3,13 @@ const {Hydrabot} = require('../../lib/hydrabot')
 describe('Hydrabot', () => {
   test('starting in dev mode and flexed correctly', async () => {
     let hydrabot = startHydrabot('development')
-    expect(hydrabot.schedule).toBeCalledWith(mockRobot, { interval: 15 * 60 * 1000 })
+    expect(hydrabot.schedule).toBeCalledWith(mockRobot, { interval: 10 * 60 * 1000 })
     expect(hydrabot.flex).toHaveBeenCalledTimes(1)
   })
 
   test('starting in production mode and flexed correctly', async () => {
     let hydrabot = startHydrabot('production')
-    expect(hydrabot.schedule).toBeCalledWith(mockRobot, { interval: 24 * 60 * 60 * 1000 })
+    expect(hydrabot.schedule).toBeCalledWith(mockRobot, { interval: 20 * 60 * 1000 })
     expect(hydrabot.flex).toBeCalledWith(mockRobot)
   })
 })
