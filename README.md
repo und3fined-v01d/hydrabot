@@ -14,7 +14,7 @@
   </a>
   <img alt="CircleCI" src="https://img.shields.io/circleci/build/gh/und3fined-v01d/hydrabot/master?color=green&label=circleci&logo=circleci">
   <a href="https://codecov.io/gh/und3fined-v01d/hydrabot">
-  <img src="https://codecov.io/github/und3fined-v01d/hydrabot/branch/master/graph/badge.svg?token=Y742K8ICNG" />
+  <img src="https://codecov.io/gh/und3fined-v01d/hydrabot/branch/master/graph/badge.svg" />
   </a>
   <img alt="GitHub issues" src="https://img.shields.io/github/issues/und3fined-v01d/hydrabot?color=lightseagreen">
   <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/und3fined-v01d/hydrabot">
