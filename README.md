@@ -12,12 +12,12 @@
   <a href="https://t.me/AlQaholic007">
     <img src="https://img.shields.io/badge/chat-on--telegram-%2310be9e.svg" alt="Free Install">
   </a>
-  <img alt="CircleCI" src="https://img.shields.io/circleci/build/gh/AlQaholic007/hydrabot/master?color=green&label=circleci&logo=circleci">
-  <a href="https://codecov.io/gh/AlQaholic007/hydrabot">
-  <img src="https://codecov.io/github/AlQaholic007/hydrabot/branch/master/graph/badge.svg?token=Y742K8ICNG" />
+  <img alt="CircleCI" src="https://img.shields.io/circleci/build/gh/und3fined-v01d/hydrabot/master?color=green&label=circleci&logo=circleci">
+  <a href="https://codecov.io/gh/und3fined-v01d/hydrabot">
+  <img src="https://codecov.io/github/und3fined-v01d/hydrabot/branch/master/graph/badge.svg?token=Y742K8ICNG" />
   </a>
-  <img alt="GitHub issues" src="https://img.shields.io/github/issues/AlQaholic007/hydrabot?color=lightseagreen">
-  <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/AlQaholic007/hydrabot">
+  <img alt="GitHub issues" src="https://img.shields.io/github/issues/und3fined-v01d/hydrabot?color=lightseagreen">
+  <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/und3fined-v01d/hydrabot">
   <img src=https://img.shields.io/badge/code_style-standard-brightgreen.svg>
 </p>
 
@@ -209,12 +209,12 @@ Read more about [weekly stats with Hydrab0t](docs/hydrabot-stats.md)
 Found a bug? Have a question? Or just want to chat?
 
 - Contact me via email at [mail@sohamp.dev](mail@sohamp.dev).
-- Create an [Issue](https://github.com/AlQaholic007/hydrabot/issues/new).
+- Create an [Issue](https://github.com/und3fined-v01d/hydrabot/issues/new).
 
 # Contributions
 We need your help:
 
-- Have an **💡idea** for a **new feature**? Please [create a new issue](https://github.com/AlQaholic007/hydrabot/issues) and tell us!
+- Have an **💡idea** for a **new feature**? Please [create a new issue](https://github.com/und3fined-v01d/hydrabot/issues) and tell us!
 - **Fix a bug**, implement a new **validator** or **action** and [open a pull request](docs/CONTRIBUTING.md)!
 
 > ☝️ **NOTE:** For development and testing. You'll want to [read about how to run it locally](docs/deploy.md#running-locally).
@@ -227,4 +227,4 @@ We need your help:
 # Authors
   - Soham Parekh <@AlQaholic007, mail@sohamp.dev>
 ---
-GPL, Copyright (c) 2020 [Soham Parekh](https://github.com/AlQaholic007)
+GPL, Copyright (c) 2020 [Soham Parekh](https://github.com/und3fined-v01d)
