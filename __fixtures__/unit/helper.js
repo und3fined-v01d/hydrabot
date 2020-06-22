@@ -1,3 +1,4 @@
+const yaml = require('js-yaml')
 const _ = require('lodash')
 
 const throwNotFound = () => {
@@ -139,6 +140,11 @@ module.exports = {
             return {data: (options.deepValidation) ? options.deepValidation : {}}
           }
         }
+      },
+      probotContext: {
+        config: () => {
+          return Promise.resolve(options.configJson)
+        }
       }
     }
   },
@@ -166,6 +172,9 @@ module.exports = {
       return Promise.resolve({
         data: options && options.files ? options.files.map(file => ({ filename: file, status: 'modified' })) : []
       })
+    }
+    context.probotContext.config = () => {
+      return Promise.resolve(yaml.safeLoad(configString))
     }
   }
 }

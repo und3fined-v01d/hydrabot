@@ -1,49 +1,54 @@
+const yaml = require('js-yaml')
 const Configuration = require('../../../lib/configuration/configuration')
-const helper = require('../../../__fixtures__/unit/helper')
 
 describe('Loading bad configuration', () => {
-  test('bad YML', () => {
-    let config = new Configuration(`
-    version: 2
-    hydrabot:
-      when: pull_request.*
-      - do: label:
-    `)
+  test('bad YML', async () => {
+    const context = createMockGhConfig()
+    context.probotContext.config = jest.fn().mockImplementation(() => {
+      throw new yaml.YAMLException('Bad YML')
+    })
+
+    const config = await Configuration.instanceWithContext(context)
     expect(config.errors.size).toBe(1)
     expect(config.errors.has(Configuration.ERROR_CODES.BAD_YML)).toBe(true)
   })
 
   test('No YML found', async () => {
-    let config = await Configuration.instanceWithContext(helper.mockContext({ files: [] }))
-    expect(config.warnings.size).toBe(1)
-    expect(config.warnings.has(Configuration.WARNING_CODES.CONFIG_NOT_FOUND)).toBe(true)
+    const context = createMockGhConfig()
+    context.probotContext.config = jest.fn().mockResolvedValue(null)
+    const config = await Configuration.instanceWithContext(context)
+
+    expect(config.errors.size).toBe(1)
+    expect(config.errors.has(Configuration.ERROR_CODES.NO_YML)).toBe(true)
   })
 
   test('wrong version', () => {
-    let config = new Configuration(`
-    version: not a number
-    hydrabot:
+    const settings = yaml.safeLoad(`
+      version: not a number
+      hydrabot:
+        pull_request:
     `)
+    const config = new Configuration(settings)
     expect(config.errors.size).toBe(1)
     expect(config.errors.has(Configuration.ERROR_CODES.UNKOWN_VERSION)).toBe(true)
   })
 
   test('missing hydrabot node', () => {
-    let config = new Configuration(`
-    version: 2
-
+    const settings = yaml.safeLoad(`
+      version: 2
     `)
+    const config = new Configuration(settings)
     expect(config.errors.size).toBe(1)
     expect(config.errors.has(Configuration.ERROR_CODES.MISSING_HYDRABOT_NODE)).toBe(true)
   })
 
   test('multiple errors', () => {
-    let yml = `
+    const settings = yaml.safeLoad(`
     version: foo
     hydrabto:
       when: bar
-    `
-    let config = new Configuration(yml)
+    `)
+    const config = new Configuration(settings)
     expect(config.errors.size).toBe(2)
   })
 })
@@ -61,11 +66,10 @@ describe('config file fetching', () => {
                 days: 20
                 message: PR test
         `
-
+    let parsedConfig = yaml.safeLoad(configString)
     let context = createMockGhConfig(configString)
-    let file = await Configuration.fetchConfigFile(context)
-    const content = Buffer.from(file.data.content, 'base64').toString()
-    expect(content).toBe(configString)
+    const config = await Configuration.fetchConfigFile(context)
+    expect(config).toEqual(parsedConfig)
   })
 
   test('fetch from main branch if the event is PR relevant and file is not modified or added', async () => {
@@ -87,6 +91,7 @@ describe('config file fetching', () => {
                 days: 20
                 message: Issue test
         `
+    let parsedConfig = yaml.safeLoad(configString)
     let context = createMockGhConfig(
       configString,
       prConfig,
@@ -94,14 +99,12 @@ describe('config file fetching', () => {
     )
 
     context.event = 'pull_request'
-    let file = await Configuration.fetchConfigFile(context)
-    let content = Buffer.from(file.data.content, 'base64').toString()
-    expect(content).toBe(configString)
+    let config = await Configuration.fetchConfigFile(context)
+    expect(config).toEqual(parsedConfig)
 
     context.event = 'pull_request_review'
-    file = await Configuration.fetchConfigFile(context)
-    content = Buffer.from(file.data.content, 'base64').toString()
-    expect(content).toBe(configString)
+    config = await Configuration.fetchConfigFile(context)
+    expect(config).toEqual(parsedConfig)
   })
 
   test('fetch from head branch if the event is relevant to PR and file is modified or added', async () => {
@@ -116,40 +119,39 @@ describe('config file fetching', () => {
                 days: 20
                 message: from HEAD
         `
-    let prConfig = `
+    let prConfigString = `
           hydrabot:
             issues:
               stale:
                 days: 20
                 message: From PR Config
         `
+    let parsedConfig = yaml.safeLoad(prConfigString)
     let files = {files: [
       { filename: '.github/hydrabot.yml', status: 'modified' }
     ]}
-    let context = createMockGhConfig(configString, prConfig, files)
+    let context = createMockGhConfig(configString, prConfigString, files)
     context.event = 'pull_request'
-    let file = await Configuration.fetchConfigFile(context)
-    let content = Buffer.from(file.data.content, 'base64').toString()
-    expect(content).toBe(prConfig)
+    let config = await Configuration.fetchConfigFile(context)
+    expect(config).toEqual(parsedConfig)
 
     context.event = 'pull_request_review'
-    file = await Configuration.fetchConfigFile(context)
-    content = Buffer.from(file.data.content, 'base64').toString()
-    expect(content).toBe(prConfig)
+    config = await Configuration.fetchConfigFile(context)
+    expect(config).toEqual(parsedConfig)
 
     files = {files: [
-      { file: '.github/hydrabot.yml', status: 'added' }
+      { filename: '.github/hydrabot.yml', status: 'added' }
     ]}
-    context = createMockGhConfig(configString, prConfig, files)
+    context = createMockGhConfig(null, prConfigString, files)
     context.event = 'pull_request'
-    content = Buffer.from(file.data.content, 'base64').toString()
-    expect(content).toBe(prConfig)
+    config = await Configuration.fetchConfigFile(context)
+    expect(config).toEqual(parsedConfig)
   })
 })
 
 describe('with version 2', () => {
   test('it loads correctly without version', () => {
-    let config = new Configuration(`
+    let configJson = yaml.safeLoad(`
       hydrabot:
         - when: pull_request.*
           validate:
@@ -162,6 +164,7 @@ describe('with version 2', () => {
             must_exclude:
               regex: 'label regex'
     `)
+    let config = new Configuration(configJson)
     config.settings = config.settings.hydrabot
     expect(config.settings[0].when).toBeDefined()
     expect(config.settings[0].validate).toBeDefined()
@@ -172,14 +175,14 @@ describe('with version 2', () => {
 describe('with version 1', () => {
   // write test to test for bad yml
   test('that constructor loads settings correctly', () => {
-    let config = new Configuration(`
+    let configJson = yaml.safeLoad(`
       version: 1
       hydrabot:
         approvals: 5
         label: 'label regex'
         title: 'title regex'
     `)
-
+    let config = new Configuration(configJson)
     config.settings = config.settings.hydrabot
     let validate = config.settings[0].validate
 
@@ -189,11 +192,12 @@ describe('with version 1', () => {
   })
 
   test('that defaults are not injected when user defined configuration exists', () => {
-    let config = new Configuration(`
+    let configJson = yaml.safeLoad(`
       version: 1
       hydrabot:
         approvals: 1
       `)
+    let config = new Configuration(configJson)
     config.settings = config.settings.hydrabot
     let validate = config.settings[0].validate
     expect(validate.find(e => e.do === 'approvals').min.count).toBe(1)
@@ -217,7 +221,7 @@ describe('with version 1', () => {
       expect(validate.find(e => e.do === 'label').must_exclude.regex).toBe('label regex')
     })
 
-    expect(context.github.repos.getContents.mock.calls.length).toBe(1)
+    expect(context.probotContext.config.mock.calls.length).toBe(1)
   })
 
   test('that instanceWithContext returns the right Configuration (pull_requests)', async () => {
@@ -236,7 +240,7 @@ describe('with version 1', () => {
       expect(validate.find(e => e.do === 'title').must_exclude.regex).toBe('title pull regex')
       expect(validate.find(e => e.do === 'label').must_exclude.regex).toBe('label pull regex')
     })
-    expect(context.github.repos.getContents.mock.calls.length).toBe(1)
+    expect(context.probotContext.config.mock.calls.length).toBe(1)
   })
 
   test('that instanceWithContext returns the right Configuration (issues)', async () => {
@@ -255,7 +259,7 @@ describe('with version 1', () => {
       expect(validate.find(e => e.do === 'title').must_exclude.regex).toBe('title issue regex')
       expect(validate.find(e => e.do === 'label').must_exclude.regex).toBe('label issue regex')
     })
-    expect(context.github.repos.getContents.mock.calls.length).toBe(1)
+    expect(context.probotContext.config.mock.calls.length).toBe(1)
   })
 
   test('that instanceWithContext loads the configuration for stale correctly when specified for pull_requests and issues separately', async () => {
@@ -336,17 +340,8 @@ describe('with version 1', () => {
           number: 1
         }
       },
-      github: {
-        repos: {
-          getContents: jest.fn().mockReturnValue(
-            Promise.reject(
-              new HttpError(
-                '{"message":"Not Found","documentation_url":"https://developer.github.com/v3/repos/contents/#get-contents"}',
-                404,
-                'Not Found')
-            )
-          )
-        }
+      probotContext: {
+        config: jest.fn().mockResolvedValue(null)
       }
     }
 
@@ -355,14 +350,41 @@ describe('with version 1', () => {
     expect(config.errors.has(Configuration.ERROR_CODES.NO_YML)).toBe(true)
   })
 
+  test('that instanceWithContext return error if hydrabot.yml is not found on PRs', async () => {
+    const prConfigString = `
+          hydrabot:
+            issues:
+              stale:
+                days: 20
+                message: From PR Config
+        `
+    let files = {files: [
+      { filename: '.github/hydrabot.yml', status: 'modified' }
+    ]}
+    let context = createMockGhConfig(null, prConfigString, files)
+    context.event = 'pull_request'
+    context.github.repos.getContents = jest.fn().mockReturnValue(
+      Promise.reject(
+        new HttpError(
+          '{"message":"Not Found","documentation_url":"https://developer.github.com/v3/repos/contents/#get-contents"}',
+          404,
+          'Not Found')
+      )
+    )
+
+    let config = await Configuration.instanceWithContext(context)
+    expect(config.hasErrors()).toBe(true)
+    expect(config.errors.has(Configuration.ERROR_CODES.GITHUB_API_ERROR)).toBe(true)
+  })
+
   test('that if pass, fail or error is undefined in v2 config, the config will not break', async () => {
-    let settings = `
+    let settings = yaml.safeLoad(`
     version: 1
     hydrabot:
       issues:
         stale:
           days: 30
-          message: 'There has not been any activity in the past month. Is there anything to follow-up?'`
+          message: 'There has not been any activity in the past month. Is there anything to follow-up?'`)
 
     const config = new Configuration(settings)
     config.settings = config.settings.hydrabot
@@ -374,7 +396,7 @@ describe('with version 1', () => {
 })
 
 // helper method to return mocked configiration.
-const createMockGhConfig = (json, prConfig, options) => {
+const createMockGhConfig = (config, prConfig, options) => {
   return {
     repo: jest.fn().mockReturnValue({
       repo: '',
@@ -391,9 +413,9 @@ const createMockGhConfig = (json, prConfig, options) => {
     },
     github: {
       repos: {
-        getContents: jest.fn(({ref}) => {
+        getContents: jest.fn(() => {
           return Promise.resolve({
-            data: { content: ref ? Buffer.from(prConfig).toString('base64') : Buffer.from(json).toString('base64') }
+            data: { content: Buffer.from(prConfig).toString('base64') }
           })
         })
       },
@@ -402,6 +424,9 @@ const createMockGhConfig = (json, prConfig, options) => {
           return { data: options.files }
         }
       }
+    },
+    probotContext: {
+      config: jest.fn().mockResolvedValue(yaml.safeLoad(config))
     }
   }
 }

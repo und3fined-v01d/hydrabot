@@ -28,7 +28,7 @@ describe('Test beforeValidate and afterValidate invocations', async () => {
   `
 
   beforeEach(() => {
-    context = Helper.mockContext('title')
+    context = Helper.mockContext()
     Helper.mockConfigWithContext(context, config)
 
     action = new Action()
@@ -75,12 +75,16 @@ describe('Test beforeValidate and afterValidate invocations', async () => {
 
 describe('#executor', () => {
   test('Bad YML', async () => {
-    let context = Helper.mockContext('title')
+    let context = Helper.mockContext()
+    context.event = 'pull_request'
+    context.payload.action = 'opened'
     Helper.mockConfigWithContext(context, `
       version: 2
       hydrabot:
     when: pull_request.*
-    `)
+    `,
+      {files: ['.github/hydrabot.yml']}
+    )
 
     context.event = 'pull_request'
     context.payload.action = 'opened'

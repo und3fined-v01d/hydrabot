@@ -1,14 +1,12 @@
 <h1 align="center">
   <br>
-  <img src="bot.jpeg" alt="Hydrab0t" width="197">
+  <img src="bot.jpeg" alt="Hydrabot" width="197">
   <br>
-  <p>Hydrab0t</p>
+  <p>Hydrabot</p>
 </h1>
 
 <p align="center">
-  <a href="https://github.com/apps/Hydrab0t">
-    <img src="https://img.shields.io/badge/FREE-INSTALL-purple.svg" alt="Free Install">
-  </a>
+  <img src="https://img.shields.io/badge/FREE-INSTALL-purple.svg" alt="Free Install">
   <a href="https://t.me/AlQaholic007">
     <img src="https://img.shields.io/badge/chat-on--telegram-%2310be9e.svg" alt="Free Install">
   </a>
@@ -21,7 +19,7 @@
   <img src=https://img.shields.io/badge/code_style-standard-brightgreen.svg>
 </p>
 
-> 🤖 **Hydrab0t** is essentially Jarvis for your team's GitHub workflow.
+> 🤖 **Hydrabot** is essentially Jarvis for your team's GitHub workflow.
 
 Some examples of what you can do:
 
@@ -44,15 +42,16 @@ Some examples of what you can do:
 
 # Usage
 
-1. [Install](https://github.com/apps/Hydrab0t) the Hydrab0t GitHub App to your repository.
-2. [Create](#configuration) your play(s) in a playbook.
-3. Commit and push the playbook to your repository at `.github/hydrabot.yml`
+1. Deploy your Hydrabot app instance
+2. Install the Hydrabot GitHub App to your repository.
+3. [Create](#configuration) your play(s) in a playbook.
+4. Commit and push the playbook to your repository at `.github/hydrabot.yml`
 
-> ☝ **NOTE:** You can also [deploy to your own server](docs/deploy.md).
+> ☝ **NOTE:** Check [deploy hyrabot to your own server](docs/deploy.md) instructions for deploying your own Hydrabot instance.
 
 # Configuration
 
-**Hydrab0t** is **unbarred** when it comes to being configurable.
+**Hydrabot** is **unbarred** when it comes to being configurable.
 Define your plays by creating a playbook as `.github/hydrabot.yml` file in your repository.
 
 ## Basics
@@ -134,7 +133,7 @@ deploy:
       https: true
 ```
 
-Read more on [automated deployments with Hydrab0t](docs/deployment.md)
+Read more on [automated deployments with Hydrabot](docs/deployment.md)
 
 ### Validator plays
 
@@ -167,7 +166,7 @@ needsInfo:
   closeComment: >
     This issue has been automatically closed because there has been no response to our request for more information from the original author.
 ```
-Read more on [auto-close issues lacking information with Hydrab0t](docs/validators.md)
+Read more on [auto-close issues lacking information with Hydrabot](docs/validators.md)
 
 # Commands
 
@@ -187,23 +186,23 @@ Use the `/remove` slash command to label an issue with a comma delimited list of
 
 ## Set Reminders
 
-Hydrab0t lets you set reminders to remind you for a particular event in the time provided by you. To do this you can use the Hydrab0t `/remind` command.
+Hydrabot lets you set reminders to remind you for a particular event in the time provided by you. To do this you can use the Hydrabot `/remind` command.
 
 ```
 /remind me to comment on the issue in 30 minutes
 ```
 
-Hydrab0t adds a `reminder` ⏰ label to the **issue** or **pull request** upon receiving this command and reminds you when the specified time has elapsed
+Hydrabot adds a `reminder` ⏰ label to the **issue** or **pull request** upon receiving this command and reminds you when the specified time has elapsed
 
 Note: _These time intervals are counted based on the UTC time but will still be relevant_
 
-# <a name="hydrabotstats"></a> Hydrab0t stats
+# <a name="hydrabotstats"></a> Hydrabot stats
 
 Weekly overview of a repositories history
 
 ![](docs/hydrabot-stats.png)
 
-Read more about [weekly stats with Hydrab0t](docs/hydrabot-stats.md)
+Read more about [weekly stats with Hydrabot](docs/hydrabot-stats.md)
 
 # Support
 Found a bug? Have a question? Or just want to chat?
@@ -218,6 +217,38 @@ We need your help:
 - **Fix a bug**, implement a new **validator** or **action** and [open a pull request](docs/CONTRIBUTING.md)!
 
 > ☝️ **NOTE:** For development and testing. You'll want to [read about how to run it locally](docs/deploy.md#running-locally).
+
+# Organisation-wide defaults
+
+You can specify a default configuration to be applied across your GitHub organisation.
+This can help reduce how many configuration files you need to maintain and make it easier
+to get started with Hydrabot.
+
+To add a default configuration:
+
+1. Create a repository called `.github` in your organisation.
+2. Create a file with the path `.github/hydrabot.yml` in this repository.
+
+The final path of the file (including the repo name) should be `<YOUR_ORG>/.github/.github/hydrabot.yml`
+
+Hydrabot will now use this file as the default when it cannot find one in a given
+repository or PR. It determines the file to use in the following order:
+
+1. A `hydrabot.yml` inside the PR.
+2. A `hydrabot.yml` inside the repository the PR is for.
+3. A `hydrabot.yml` at `<YOUR_ORG>/.github/.github/hydrabot.yml`.
+
+**Note**: Hydrabot will only ever use a _single_ file. It does _not_ merge files.
+
+## Why the weird default file path?
+
+The Probots library that Hydrabot uses automatically searches for config files
+in a repo named `.github` within the organisation.
+
+The double nesting of the `<YOUR_ORG>/.github/.github/hydrabot.yml` default
+file is unfortunately necessary. The GitHub app permissions model only lets you
+specify a single path for your probot to access, so it must be the same as in
+regular repositories.
 
 # Roadmap
 - Comment on issues/PRs when certain labels assigned
