@@ -27,10 +27,10 @@ hydrabot:
           message: PR must be associated with one or more issues
       - do: description
         and:
-          must_include:
+          - must_include:
             regex: ^Closes \#\d$
             message: PR must be associated with one or more issues
-          must_include:
+          - must_include:
             regex: approved:*
             message: PR cannot be merged before being approved by maintainers
         must_exclude:
